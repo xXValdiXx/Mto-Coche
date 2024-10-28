@@ -1,0 +1,10 @@
+"use strict";
+exports.__esModule = true;
+exports.api = void 0;
+var express_1 = require("express");
+var https_1 = require("firebase-functions/v2/https");
+var carRoutes_1 = require("../routes/carRoutes");
+var app = (0, express_1["default"])();
+app.use(express_1["default"].json());
+app.use("/api", carRoutes_1["default"]);
+exports.api = (0, https_1.onRequest)(app);
