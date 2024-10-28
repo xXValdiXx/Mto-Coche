@@ -1,4 +1,4 @@
-import { Car } from "../Interfaces/carInterface";
+import { Car } from "../interfaces/carInterface";
 import { CarRepository } from "../repositories/carRepo";
 
 export const CarService = {

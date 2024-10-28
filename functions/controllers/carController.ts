@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { CarService } from "../services/CarService";
-import { Car } from "../Interfaces/carInterface";
+import { Car } from "../interfaces/carInterface";
 
 export const CarController = {
   async createCar(req: Request, res: Response): Promise<void> {

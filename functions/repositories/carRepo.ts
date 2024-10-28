@@ -1,5 +1,5 @@
 import { firestore } from "../config/firebaseConfig";
-import { Car } from "../Interfaces/carInterface";
+import { Car } from "../interfaces/carInterface";
 
 const collectionRef = firestore.collection("cars");
 
