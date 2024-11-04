@@ -8,6 +8,7 @@ export const CarRepository = {
     const newDoc = await collectionRef.add(car);
     return { id: newDoc.id, ...car };
   },
+
   async getCars(): Promise<Car[]> {
     const snapshot = await collectionRef.get(); 
     if (snapshot.empty) return [];
@@ -16,6 +17,20 @@ export const CarRepository = {
       id: doc.id,
       ...doc.data(),
     })) as Car[];
+  },
+
+  async getCarById(id: string): Promise<Car | null> {
+    const doc = await collectionRef.doc(id).get();
+    if (!doc.exists) return null;
+    return { id: doc.id, ...doc.data() } as Car;
+  },
+
+  async updateCar(id: string, car: Partial<Car>): Promise<void> {
+    await collectionRef.doc(id).update(car);
+  },
+  
+  async deleteCar(id: string): Promise<void> {
+    await collectionRef.doc(id).delete();
   }
 
 };

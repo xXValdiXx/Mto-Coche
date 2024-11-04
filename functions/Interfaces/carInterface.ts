@@ -3,5 +3,6 @@ export interface Car {
     owner: string;
     model: string;
     color: string;
+    services: string[];
     year: number;
   }
