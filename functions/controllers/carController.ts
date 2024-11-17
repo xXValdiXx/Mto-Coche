@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
-import { CarService } from "../services/carService";
-import { Car } from "../Interfaces/carInterface";
+import { carService } from "../services/carService";
+import { Car } from "../interfaces/carInterface";
+import { CarQueryOptions } from "../interfaces/carQueryInterface";
 
-export const CarController = {
+export const carController = {
   async createCar(req: Request, res: Response): Promise<void> {
     try {
       const car: Car = {
@@ -13,7 +14,7 @@ export const CarController = {
         services: req.body.services as string[],
       };
 
-      const addCar = await CarService.addCar(car);
+      const addCar = await carService.addCar(car);
       res.status(200).json(addCar);
     } catch (error) {
       console.error("Error adding car document:", error);
@@ -22,22 +23,36 @@ export const CarController = {
   },
   
   async getCars(req: Request, res: Response): Promise<void> {
+    const payload = req.query as unknown as CarQueryOptions
+
+    if (req.query.color) {
+      payload.color = req.query.color as string;
+    }
+
+    if (req.query.year) {
+      payload.year = Number(req.query.year);
+    }
+
+    if (req.query.services) {
+      payload.services = req.query.services as string;
+    }
+
     try {
-      const car = await CarService.getCars();
-      if (car) {
-        res.status(200).json(car);
+      const cars = await carService.getCars(payload);
+      if (cars) {
+        res.status(200).json(cars);
       } else {
-        res.status(404).json({ message: "Car not found" });
+        res.status(404).json({ message: "Cars not found" });
       }
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch car" });
+      res.status(500).json({ error: "Failed to fetch cars" });
     }
   },
 
   async getCarById(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const car = await CarService.getCarById(id);
+      const car = await carService.getCarById(id);
       if (car) {
         res.status(200).json(car);
       } else {
@@ -60,7 +75,7 @@ export const CarController = {
         services: req.body.services,
       };
 
-      await CarService.updateCar(id, carUpdates);
+      await carService.updateCar(id, carUpdates);
       res.status(200).json({ message: "Car updated successfully" });
     } catch (error) {
       console.error("Error updating car:", error);
@@ -71,7 +86,7 @@ export const CarController = {
   async deleteCar(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      await CarService.deleteCar(id);
+      await carService.deleteCar(id);
       res.status(200).json({ message: "Car deleted successfully" });
     } catch (error) {
       console.error("Error deleting car:", error);

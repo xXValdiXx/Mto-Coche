@@ -1,18 +1,34 @@
 import { firestore } from "../config/firebaseConfig";
-import { Car } from "../Interfaces/carInterface";
+import { Car } from "../interfaces/carInterface";
+import { CarQueryOptions } from "../interfaces/carQueryInterface";
 
 const collectionRef = firestore.collection("cars");
 
-export const CarRepository = {
+export const carRepository = {
   async addCar(car: Car): Promise<Car> {
     const newDoc = await collectionRef.add(car);
     return { id: newDoc.id, ...car };
   },
 
-  async getCars(): Promise<Car[]> {
-    const snapshot = await collectionRef.get(); 
+  async getCars(option: CarQueryOptions): Promise<Car[]> {
+    let query: FirebaseFirestore.Query<FirebaseFirestore.DocumentData> = collectionRef;
+
+    // Aplica los filtros si se proporcionan
+    if (option?.color) {
+      query = query.where("color", "==", option.color);
+    }
+    if (option?.year) {
+      query = query.where("year", "==", option.year);
+    }
+    if (option?.services) {
+      query = query.where("services", "array-contains", option.services);
+    }
+
+    // Ejecuta la consulta
+    const snapshot = await query.get();
+
     if (snapshot.empty) return [];
-  
+
     return snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
@@ -25,12 +41,11 @@ export const CarRepository = {
     return { id: doc.id, ...doc.data() } as Car;
   },
 
-  async updateCar(id: string, car: Partial<Car>): Promise<void> {
-    await collectionRef.doc(id).update(car);
+  async updateCar(id: string, car: Car): Promise<void> {
+    await collectionRef.doc(id).set(car);
   },
   
   async deleteCar(id: string): Promise<void> {
     await collectionRef.doc(id).delete();
   }
-
 };
